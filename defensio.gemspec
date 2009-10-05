@@ -9,14 +9,16 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Mercier"]
-  s.date = %q{2009-09-24}
+  s.date = %q{2009-10-05}
   s.description = %q{Official Ruby library for Defensio 2.0}
   s.email = %q{support@defensio.com}
   s.extra_rdoc_files = [
-    "LICENSE"
+    "LICENSE",
+     "README"
   ]
   s.files = [
     "LICENSE",
+     "README",
      "Rakefile",
      "VERSION",
      "lib/defensio.rb",
@@ -28,6 +30,9 @@ Gem::Specification.new do |s|
   s.rubyforge_project = %q{defensio}
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{Official Ruby library for Defensio 2.0}
+  s.test_files = [
+    "test/defensio_test.rb"
+  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
