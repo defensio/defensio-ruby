@@ -95,8 +95,13 @@ class Defensio
     else
       raise ArgumentError, "Unknown request type: #{request.class}"
     end
-    
+
     parse_body(data)
+  end
+  
+  # See handle_post_document_async_callback
+  def self.handle_post_document_async_callback(request)
+    Defensio.new(nil).handle_post_document_async_callback(request)
   end
 
   protected

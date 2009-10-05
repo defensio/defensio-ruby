@@ -122,6 +122,7 @@ class DefensioTest < Test::Unit::TestCase
                "spaminess"         => 0.95,
                "dictionary-match"  => true }
 
+    assert_equal result, @d.class.handle_post_document_async_callback(document_body(SIGNATURE))
     assert_equal result, @d.handle_post_document_async_callback(document_body(SIGNATURE))
   end
 
@@ -136,10 +137,14 @@ class DefensioTest < Test::Unit::TestCase
                "dictionary-match"  => true }
     
     fake_request_object = OpenStruct.new(:body => StringIO.new(document_body(SIGNATURE)))
+    assert_equal result, @d.class.handle_post_document_async_callback(fake_request_object)
+
+    fake_request_object = OpenStruct.new(:body => StringIO.new(document_body(SIGNATURE)))
     assert_equal result, @d.handle_post_document_async_callback(fake_request_object)
   end
 
   def test_handle_post_document_async_callback__invalid_object_type
+    assert_raise(ArgumentError) { @d.class.handle_post_document_async_callback(nil) }
     assert_raise(ArgumentError) { @d.handle_post_document_async_callback(nil) }
   end
 
