@@ -46,7 +46,7 @@ class Defensio
   end
   
   # Get the status of an existing document
-  # @param [String] signature The signature of the document to modify
+  # @param [String] signature The signature of the document to retrieve
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def get_document(signature)
     call :get, api_url("documents", signature)
