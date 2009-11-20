@@ -34,8 +34,7 @@ class DefensioTest < Test::Unit::TestCase
       query = "client=Defensio-Ruby%20%7C%200.1%20%7C%20Carl%20Mercier%20%7C%20cmercier@websense.com&content=We%20sell%20cheap%20Viagra!%20[spam,0.95]&platform=my_awesome_app&type=test"
       Patron::Session.any_instance.expects(:post).with("#{API_HOST}/#{API_VERSION}/users/#{API_KEY}/documents.#{FORMAT}?#{query}", {}).once.returns(FakePatronResponse.new(200, document_body(SIGNATURE)))
     end
-    
-    # :client is automatically set by the library, but can be overridden.
+
     data = { :content => "We sell cheap Viagra! [spam,0.95]", :platform => "my_awesome_app", :type => "test" }
     status, body = @d.post_document(data)
     assert body.is_a?(Hash)
@@ -49,7 +48,6 @@ class DefensioTest < Test::Unit::TestCase
       Patron::Session.any_instance.expects(:get).with("#{API_HOST}/#{API_VERSION}/users/#{API_KEY}/documents/#{SIGNATURE}.#{FORMAT}").once.returns(FakePatronResponse.new(200, document_body(SIGNATURE)))
     end
     
-    # :client is automatically set by the library, but can be overridden.
     status, body = @d.get_document(SIGNATURE)
     assert body.is_a?(Hash)
     assert_equal 200, status

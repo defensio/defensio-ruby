@@ -27,8 +27,8 @@ class Defensio
   
   attr_reader :http_session, :client
   
-  def initialize(api_key)
-    @client = CLIENT
+  def initialize(api_key, client = CLIENT)
+    @client = client
     @api_key = api_key
   end
 
@@ -41,7 +41,7 @@ class Defensio
   # @param [Hash] data The parameters to be sent to Defensio. Keys can either be Strings or Symbols
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def post_document(data)
-    data = { :client => CLIENT }.merge(data)
+    data = { :client => @client }.merge(data)
     call :post, api_url("documents"), data
   end
   
