@@ -6,7 +6,7 @@ require 'redgreen'
 require 'ostruct'
 
 class DefensioTest < Test::Unit::TestCase
-  MOCK_RESPONSE = false
+  MOCK_RESPONSE = true
   API_KEY       = "1234567890"
   OWNER_URL     = "http://example.org"
   SIGNATURE     = "abcdefghijklmnop"
