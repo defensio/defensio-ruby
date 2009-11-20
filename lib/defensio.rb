@@ -18,7 +18,7 @@ class Defensio
   API_HOST      = "http://api.defensio.com"
 
   # You should't modify anything below this line.
-  LIB_VERSION   = "0.1"
+  LIB_VERSION   = "0.9"
   ROOT_NODE     = "defensio-result"
   FORMAT        = :yaml
   USER_AGENT    = "Defensio-Ruby #{LIB_VERSION}"
@@ -79,8 +79,8 @@ class Defensio
   end
 
   # Filter a set of values based on a pre-defined dictionary
-  def post_dictionary_filter(data)
-    call :post, api_url("dictionary-filter"), data
+  def post_profanity_filter(data)
+    call :post, api_url("profanity-filter"), data
   end
   
   # Takes the request object (Rails, Sinatra, Merb) of an async request callback and returns a hash

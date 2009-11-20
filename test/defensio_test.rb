@@ -6,16 +6,15 @@ require 'redgreen'
 require 'ostruct'
 
 class DefensioTest < Test::Unit::TestCase
-  MOCK_RESPONSE = true
-  API_KEY       = "1234567890"
+  MOCK_RESPONSE = false
+  API_KEY       = "d2f5e5da5b7a"
   OWNER_URL     = "http://example.org"
   SIGNATURE     = "abcdefghijklmnop"
 
-  LIB_VERSION = 0.1
   API_VERSION = 2.0
   API_HOST    = "http://api.defensio.com"
   FORMAT      = :yaml
-  HEADERS     = {"User-Agent" => "Defensio-Ruby 0.1", "Content-Type" => "text/yaml"}
+  HEADERS     = {"User-Agent" => "Defensio-Ruby #{Defensio::LIB_VERSION}", "Content-Type" => "text/yaml"}
 
   # API METHOD TESTS -- Useful to learn how to use the library
   def test_get_user
@@ -31,7 +30,7 @@ class DefensioTest < Test::Unit::TestCase
 
   def test_post_document
     if MOCK_RESPONSE
-      query = "client=Defensio-Ruby%20%7C%200.1%20%7C%20Carl%20Mercier%20%7C%20cmercier@websense.com&content=We%20sell%20cheap%20Viagra!%20[spam,0.95]&platform=my_awesome_app&type=test"
+      query = "client=Defensio-Ruby%20%7C%20#{Defensio::LIB_VERSION}%20%7C%20Carl%20Mercier%20%7C%20cmercier@websense.com&content=We%20sell%20cheap%20Viagra!%20[spam,0.95]&platform=my_awesome_app&type=test"
       Patron::Session.any_instance.expects(:post).with("#{API_HOST}/#{API_VERSION}/users/#{API_KEY}/documents.#{FORMAT}?#{query}", {}).once.returns(FakePatronResponse.new(200, document_body(SIGNATURE)))
     end
 
@@ -95,19 +94,19 @@ class DefensioTest < Test::Unit::TestCase
     assert body["data"][0]["date"].is_a?(Date)
   end
   
-  def test_post_dictionary_filter
+  def test_post_profanity_filter
     if MOCK_RESPONSE
       query="OtherField=hello%20again&field1=hello%20world"
-      Patron::Session.any_instance.expects(:post).with("#{API_HOST}/#{API_VERSION}/users/#{API_KEY}/dictionary-filter.#{FORMAT}?#{query}", {}).once.returns(FakePatronResponse.new(200, dictionary_filter_body))
+      Patron::Session.any_instance.expects(:post).with("#{API_HOST}/#{API_VERSION}/users/#{API_KEY}/profanity-filter.#{FORMAT}?#{query}", {}).once.returns(FakePatronResponse.new(200, profanity_filter_body))
     end
     
-    status, body = @d.post_dictionary_filter("field1"=>"hello world", "OtherField"=>"hello again")
+    status, body = @d.post_profanity_filter("field1"=>"hello world", "OtherField"=>"hello again")
     assert body.is_a?(Hash)
     assert_equal 200, status
     assert_equal "success", body["status"]
-    assert body["filtered"].is_a?(Array)
-    assert_equal "field1", body["filtered"][0]["key"]
-    assert_equal "OtherField", body["filtered"][1]["key"]
+    assert body["filtered"].is_a?(Hash)
+    assert body["filtered"].keys.include?("field1")
+    assert body["filtered"].keys.include?("OtherField")
   end
   
   def test_handle_post_document_async_callback__string
@@ -118,7 +117,7 @@ class DefensioTest < Test::Unit::TestCase
                "allow"             => false,
                "classification"    => "malicious",
                "spaminess"         => 0.95,
-               "dictionary-match"  => true }
+               "profanity-match"  => true }
 
     assert_equal result, @d.class.handle_post_document_async_callback(document_body(SIGNATURE))
     assert_equal result, @d.handle_post_document_async_callback(document_body(SIGNATURE))
@@ -132,7 +131,7 @@ class DefensioTest < Test::Unit::TestCase
                "allow"             => false,
                "classification"    => "malicious",
                "spaminess"         => 0.95,
-               "dictionary-match"  => true }
+               "profanity-match"  => true }
     
     fake_request_object = OpenStruct.new(:body => StringIO.new(document_body(SIGNATURE)))
     assert_equal result, @d.class.handle_post_document_async_callback(fake_request_object)
@@ -209,7 +208,7 @@ class DefensioTest < Test::Unit::TestCase
         "allow"             => false,
         "classification"    => "malicious",
         "spaminess"         => 0.95,
-        "dictionary-match"  => true } 
+        "profanity-match"  => true } 
     }.send("to_#{FORMAT}")
   end
 
@@ -222,7 +221,7 @@ class DefensioTest < Test::Unit::TestCase
         "allow"             => true,
         "classification"    => "innocent",
         "spaminess"         => 0.95,
-        "dictionary-match"  => true } 
+        "profanity-match"  => true } 
     }.send("to_#{FORMAT}")
   end
   
@@ -275,15 +274,15 @@ class DefensioTest < Test::Unit::TestCase
     }.send("to_#{FORMAT}")
   end
   
-  def dictionary_filter_body
+  def profanity_filter_body
     { "defensio-result" => {
       "api-version"       => API_VERSION, 
       "status"            => "success", 
       "message"           => nil,
-      "filtered" => [ 
-        { "key"   => "field1",     "value" => "hello world" },
-        { "key"   => "OtherField", "value" => "hello again" }
-      ] }
+      "filtered" => 
+        { "field1"     => "hello world",
+          "OtherField" => "hello again"  }
+      }
     }.send("to_#{FORMAT}")
   end
 end
