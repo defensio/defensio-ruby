@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Mercier"]
-  s.date = %q{2009-10-05}
+  s.date = %q{2009-12-07}
   s.description = %q{Official Ruby library for Defensio 2.0}
   s.email = %q{support@defensio.com}
   s.extra_rdoc_files = [
@@ -17,7 +17,8 @@ Gem::Specification.new do |s|
      "README"
   ]
   s.files = [
-    "LICENSE",
+    ".gitignore",
+     "LICENSE",
      "README",
      "Rakefile",
      "VERSION",
@@ -27,7 +28,6 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/defensio/defensio-ruby}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubyforge_project = %q{defensio}
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{Official Ruby library for Defensio 2.0}
   s.test_files = [
