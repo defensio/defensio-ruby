@@ -9,7 +9,7 @@ begin
     gemspec.description = "Official Ruby library for Defensio 2.0"
     gemspec.email = "support@defensio.com"
     gemspec.homepage = "http://github.com/defensio/defensio-ruby"
-    gemspec.authors = ["Carl Mercier"]
+    gemspec.authors = ["The Defensio Team", "Carl Mercier"]
     gemspec.add_dependency('patron', '>= 0.4.4')
   end
   Jeweler::GemcutterTasks.new

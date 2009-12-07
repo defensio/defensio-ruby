@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version = "0.9.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Carl Mercier"]
+  s.authors = ["The Defensio Team", "Carl Mercier"]
   s.date = %q{2009-12-07}
   s.description = %q{Official Ruby library for Defensio 2.0}
   s.email = %q{support@defensio.com}
@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
      "README",
      "Rakefile",
      "VERSION",
+     "defensio.gemspec",
      "lib/defensio.rb",
      "test/defensio_test.rb"
   ]
