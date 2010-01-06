@@ -90,7 +90,7 @@ class Defensio
   def handle_post_document_async_callback(request)
     if request.is_a?(String)
       data = request
-    elsif request.respond_to?(:body) && request.body.is_a?(StringIO)
+    elsif request.respond_to?(:body) && request.body.respond_to?(:read)
       data = request.body.read
     else
       raise ArgumentError, "Unknown request type: #{request.class}"
