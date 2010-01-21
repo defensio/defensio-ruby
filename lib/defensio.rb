@@ -9,7 +9,7 @@
 #
 
 require 'rubygems'
-require 'patron'
+require 'httparty'
 require 'uri'
 
 class Defensio
@@ -18,14 +18,18 @@ class Defensio
   API_HOST      = "http://api.defensio.com"
 
   # You should't modify anything below this line.
-  LIB_VERSION   = "0.9"
+  LIB_VERSION   = "0.9.1"
   ROOT_NODE     = "defensio-result"
   FORMAT        = :yaml
   USER_AGENT    = "Defensio-Ruby #{LIB_VERSION}"
   CLIENT        = "Defensio-Ruby | #{LIB_VERSION} | Carl Mercier | cmercier@websense.com"
   KEEP_ALIVE    = false
   
-  attr_reader :http_session, :client
+  include HTTParty
+  format FORMAT
+  base_uri API_HOST
+  
+  attr_reader :api_key, :client
   
   def initialize(api_key, client = CLIENT)
     @client = client
@@ -34,7 +38,7 @@ class Defensio
 
   # Get information about the api key
   def get_user
-    call :get, api_url
+    respond self.class.get(api_path)
   end
   
   # Create and analyze a new document
@@ -42,14 +46,14 @@ class Defensio
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def post_document(data)
     data = { :client => @client }.merge(data)
-    call :post, api_url("documents"), data
+    respond self.class.post(api_path("documents"), :body => data)
   end
   
   # Get the status of an existing document
   # @param [String] signature The signature of the document to retrieve
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def get_document(signature)
-    call :get, api_url("documents", signature)
+    respond self.class.get(api_path("documents", signature))
   end
   
   # Modify the properties of an existing document
@@ -57,30 +61,33 @@ class Defensio
   # @param [Hash] data The parameters to be sent to Defensio. Keys can either be Strings or Symbols
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def put_document(signature, data)
-    call :put, api_url("documents", signature), data
+    respond self.class.put(api_path("documents", signature), :body => data)
   end
   
   # Get basic statistics for the current user
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def get_basic_stats
-    call :get, api_url("basic-stats")
+    respond self.class.get(api_path("basic-stats"))
   end
 
   # Get more exhaustive statistics for the current user
   # @param [Hash] data The parameters to be sent to Defensio. Keys can either be Strings or Symbols
   # @return [Array] An array containing 2 values: the HTTP status code & a Hash with the values returned by Defensio
   def get_extended_stats(data)
-    result = call(:get, api_url("extended-stats"), data)
-    0.upto(result[1]["data"].size - 1) do |i|
-      result[1]["data"][i]["date"] = Date.parse(result[1]["data"][i]["date"])
+    result = self.class.get(api_path("extended-stats"), :query => data)
+    code = result.code
+    result = result[ROOT_NODE]
+
+    0.upto(result["data"].size - 1) do |i|
+      result["data"][i]["date"] = Date.parse(result["data"][i]["date"])
     end
       
-    result
+    [code, result]
   end
 
   # Filter a set of values based on a pre-defined dictionary
   def post_profanity_filter(data)
-    call :post, api_url("profanity-filter"), data
+    respond self.class.post(api_path("profanity-filter"), :body => data)
   end
   
   # Takes the request object (Rails, Sinatra, Merb) of an async request callback and returns a hash
@@ -105,46 +112,15 @@ class Defensio
   end
 
   protected
-    def api_url(action = nil, id = nil)
-      path = "#{API_HOST}/#{API_VERSION}/users/#{@api_key}"
+    def respond(response)
+      [response.code, response[ROOT_NODE]]
+    end
+    
+    def api_path(action = nil, id = nil)
+      path = "/#{API_VERSION}/users/#{@api_key}"
       path += "/#{action}" if action
       path += "/#{id}" if id
       path += ".#{FORMAT}"
-    end
-  
-    def http_session
-      return @http_session if KEEP_ALIVE && @http_session
-      @http_session = Patron::Session.new
-      @http_session.timeout = 20
-      @http_session.headers['User-Agent'] = USER_AGENT
-      @http_session.headers['Content-Type'] = "text/#{FORMAT}"
-      @http_session
-    end
-
-    def http_session=(session)
-      @http_session = session
-    end
-    
-    def call(method, url, data = nil)
-      data = hash_to_query_string(data) if data.is_a?(Hash)
-      url = url + "?#{data}" unless data.nil? || data.empty?
-
-      response = case method
-      when :get
-        http_session.get(url)
-      when :delete
-        http_session.delete(url)
-      when :post
-        http_session.post(url, {})
-      when :put
-        http_session.put(url, {})
-      else
-        raise(ArgumentError, "Invalid HTTP method: #{method}")
-      end
-      
-      http_session = nil unless KEEP_ALIVE
-      
-      [response.status, parse_body(response.body)]
     end
 
     def parse_body(str)
@@ -155,19 +131,4 @@ class Defensio
       end
     end
 
-    def hash_to_query_string(data)
-      return nil unless data.is_a?(Hash)
-      out = ""
-      sort_hash_by_key(data).each do |item|
-        k, v = item[0], item[1]
-        out += "&" unless out.empty?
-        k = k.to_s.gsub(/_/, "-") if k.is_a?(Symbol)
-        out += "#{k}=#{URI.escape(v.to_s)}"
-      end
-      out
-    end
-
-    def sort_hash_by_key(hash)
-      hash.keys.sort_by {|s| s.to_s}.map {|key| [key, hash[key]] }
-    end
 end

@@ -10,7 +10,7 @@ begin
     gemspec.email = "support@defensio.com"
     gemspec.homepage = "http://github.com/defensio/defensio-ruby"
     gemspec.authors = ["The Defensio Team", "Carl Mercier"]
-    gemspec.add_dependency('patron', '>= 0.4.4')
+    gemspec.add_dependency('httparty', '>= 0.5.0')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
