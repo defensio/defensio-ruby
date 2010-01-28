@@ -1,11 +1,6 @@
 #
-#  Defensio-Ruby version 0.1
+#  Defensio-Ruby
 #  Written by the Defensio team at Websense, Inc.
-#
-#  Make sure to install the necessary gems by running the following commands:
-#  $ sudo gem install patron -v 0.4.4
-#  On Linux, you'll also need to install the libcurl development package. On Ubuntu, simply do:
-#  $ sudo apt-get install libcurl4-openssl-dev
 #
 
 require 'rubygems'
