@@ -6,7 +6,7 @@
 require 'rubygems'
 require 'httparty'
 require 'uri'
-require 'json'
+require 'multi_json'
 
 class Defensio
   # You shouldn't modify these values unless you really know what you are doing. And then again...
@@ -121,7 +121,7 @@ class Defensio
 
     def parse_body(str)
       if FORMAT == :json
-        return JSON.parse(str)[ROOT_NODE]
+        return MultiJson.load(str)[ROOT_NODE]
       else
         raise(NotImplementedError, "This library doesn't support this format: #{FORMAT}")
       end
