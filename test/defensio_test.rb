@@ -3,7 +3,6 @@ DEFENSIO_ENV = "test"
 require File.dirname(__FILE__) + "/../lib/defensio"
 require 'test/unit'
 require 'mocha'
-require 'redgreen'
 require 'ostruct'
 
 # You must run this script as following:
@@ -13,8 +12,8 @@ class DefensioTest < Test::Unit::TestCase
   API_HOST    = "http://api.defensio.com"
   API_VERSION = 2.0
   OWNER_URL   = "http://example.org"
-  FORMAT      = :yaml
-  HEADERS     = {"User-Agent" => "Defensio-Ruby #{Defensio::LIB_VERSION}", "Content-Type" => "text/yaml"}
+  FORMAT      = :json
+  HEADERS     = {"User-Agent" => "Defensio-Ruby #{Defensio::LIB_VERSION}", "Content-Type" => "text/json"}
 
   # API METHOD TESTS -- Useful to learn how to use the library
   def test_get_user
@@ -103,7 +102,7 @@ class DefensioTest < Test::Unit::TestCase
                  "profanity-match"  => true }
               }
     
-    assert_equal Hash, @d.class.handle_post_document_async_callback(result.to_yaml).class
+    assert_equal Hash, @d.class.handle_post_document_async_callback(result.to_json).class
   end
 
   def test_handle_post_document_async_callback__request_object
@@ -118,12 +117,12 @@ class DefensioTest < Test::Unit::TestCase
                    "profanity-match"  => true }
                 }
     
-    fake_request_object = OpenStruct.new(:body => StringIO.new(post_data.to_yaml))
+    fake_request_object = OpenStruct.new(:body => StringIO.new(post_data.to_json))
     result = @d.class.handle_post_document_async_callback(fake_request_object)
     assert_equal Hash, result.class
     assert_equal "success", result["status"]
     
-    fake_request_object = OpenStruct.new(:body => StringIO.new(post_data.to_yaml))
+    fake_request_object = OpenStruct.new(:body => StringIO.new(post_data.to_json))
     result = @d.handle_post_document_async_callback(fake_request_object)
     assert_equal Hash, result.class
     assert_equal "success", result["status"]
@@ -137,14 +136,14 @@ class DefensioTest < Test::Unit::TestCase
   
   # OTHER TESTS
   def test_api_path
-    assert_equal "/#{API_VERSION}/users/#{@api_key}.yaml", @d.send(:api_path)
-    assert_equal "/#{API_VERSION}/users/#{@api_key}/documents.yaml", @d.send(:api_path, "documents")
-    assert_equal "/#{API_VERSION}/users/#{@api_key}/documents/abcdefghijklmnop.yaml", @d.send(:api_path, "documents", "abcdefghijklmnop")
+    assert_equal "/#{API_VERSION}/users/#{@api_key}.json", @d.send(:api_path)
+    assert_equal "/#{API_VERSION}/users/#{@api_key}/documents.json", @d.send(:api_path, "documents")
+    assert_equal "/#{API_VERSION}/users/#{@api_key}/documents/abcdefghijklmnop.json", @d.send(:api_path, "documents", "abcdefghijklmnop")
   end
   
   def test_parse_body
     parsed = {"hello"=>"world"}
-    assert_equal parsed, @d.send(:parse_body, "---\ndefensio-result:\n  hello: world")
+    assert_equal parsed, @d.send(:parse_body, '{"defensio-result":{"hello":"world"}}')
   end
 
   # HELPERS AND SETUP

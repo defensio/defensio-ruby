@@ -11,6 +11,7 @@ begin
     gemspec.homepage = "http://github.com/defensio/defensio-ruby"
     gemspec.authors = ["The Defensio Team", "Carl Mercier"]
     gemspec.add_dependency('httparty', '>= 0.5.0')
+    gemspec.add_dependency('json')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

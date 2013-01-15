@@ -6,6 +6,7 @@
 require 'rubygems'
 require 'httparty'
 require 'uri'
+require 'json'
 
 class Defensio
   # You shouldn't modify these values unless you really know what you are doing. And then again...
@@ -15,7 +16,7 @@ class Defensio
   # You should't modify anything below this line.
   LIB_VERSION   = "0.9.1"
   ROOT_NODE     = "defensio-result"
-  FORMAT        = :yaml
+  FORMAT        = :json
   USER_AGENT    = "Defensio-Ruby #{LIB_VERSION}"
   CLIENT        = "Defensio-Ruby | #{LIB_VERSION} | Carl Mercier | cmercier@websense.com"
   KEEP_ALIVE    = false
@@ -119,8 +120,8 @@ class Defensio
     end
 
     def parse_body(str)
-      if FORMAT == :yaml
-        return YAML::load(str)[ROOT_NODE]
+      if FORMAT == :json
+        return JSON.parse(str)[ROOT_NODE]
       else
         raise(NotImplementedError, "This library doesn't support this format: #{FORMAT}")
       end
